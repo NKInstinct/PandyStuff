@@ -1,17 +1,35 @@
 library(shiny)
 
 ui <- fluidPage(
-    textInput("codeStr", "Enter string to turn into QR code here:"),
-    actionButton("codeConfirm", "Encode!"),
-    plotOutput("qrplot"),
-    downloadButton("download", "Download QR code")
+  titlePanel("QR Code Generator"),
+  sidebarLayout(
+    sidebarPanel(
+      textInput("codeStr", "Enter string to turn into QR code here:"),
+      radioButtons("errorButton", 
+                   "Error Tolerance",
+                   choiceNames = list("Low",
+                                      "Medium",
+                                      "High",
+                                      "Highest"),
+                   choiceValues = list("L",
+                                       "M",
+                                       "Q",
+                                       "H"),
+                   selected = "Q"),
+      actionButton("codeConfirm", "Encode!"),
+      downloadButton("download", "Download QR code")
+    ),
+    mainPanel(
+      plotOutput("qrplot")
+    )
+  )
 )
 
 server <- function(input, output, session) {
   QR <- reactive(qrcode::qrcode_gen(input$codeStr, 
                                     plotQRcode = FALSE, 
                                     dataOutput = TRUE,
-                                    ErrorCorrectionLevel = "Q"))
+                                    ErrorCorrectionLevel = input$errorButton))
   HMap <- eventReactive(input$codeConfirm, {
     heatmap(QR(), 
             Colv = NA, 
