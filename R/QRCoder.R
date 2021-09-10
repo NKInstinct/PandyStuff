@@ -45,13 +45,7 @@ QRCoder <- function(...){
                                       dataOutput = TRUE,
                                       ErrorCorrectionLevel = input$errorButton))
     HMap <- eventReactive(input$codeConfirm, {
-      heatmap(QR(), 
-              Colv = NA, 
-              Rowv = NA, 
-              revC = TRUE, 
-              labRow = "", 
-              labCol = "", 
-              col = grey.colors(2, start = 1, end = 0))
+      qr_heatmap(QR())
     })
     
     output$qrplot <- renderPlot(HMap())
@@ -64,13 +58,7 @@ QRCoder <- function(...){
       },
       content = function(file){
         png(file)
-        heatmap(QR(), 
-                Colv = NA, 
-                Rowv = NA, 
-                revC = TRUE, 
-                labRow = "", 
-                labCol = "", 
-                col = grey.colors(2, start = 1, end = 0))
+        qr_heatmap(QR())
         dev.off()
       }
     )
@@ -78,3 +66,25 @@ QRCoder <- function(...){
   
   shinyApp(ui, server)
 }
+
+qr_heatmap <- function(m){
+  heatmap(m,
+          Colv = NA,
+          Rowv = NA,
+          revC = TRUE,
+          labRow = "",
+          labCol = "",
+          col = grey.colors(2, start = 1, end = 0))
+}
+
+
+# # test out overlay - so far isn't working, something about the intersection
+# between shiny's image grabbers and magick's makes it not work.
+# matr <- qrcode::qrcode_gen("www.pandemoniumbooks.com", ErrorCorrectionLevel = "H", dataOutput = TRUE, plotQRcode = FALSE)
+# logo <- magick::image_read("data/plogo.png")
+# {
+#   magick::image_graph(width = 600, height = 600)
+# qr_heatmap(matr)
+# hmap <- magick::image_capture()
+# }
+# magick::image_composite(hmap, logo, offset = "+180+180")
